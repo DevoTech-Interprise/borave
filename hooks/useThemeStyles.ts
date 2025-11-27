@@ -1,7 +1,7 @@
-import { StyleSheet } from 'react-native';
-import { useThemeColor } from './use-theme-color';
 import { Colors } from '@/constants/theme';
+import { StyleSheet } from 'react-native';
 import { useColorScheme } from './use-color-scheme';
+import { useThemeColor } from './use-theme-color';
 
 export function useThemeStyles() {
   const colorScheme = useColorScheme();
@@ -14,6 +14,11 @@ export function useThemeStyles() {
   const text = getColor('text');
   const tint = getColor('tint');
   const icon = getColor('icon');
+  const surface = getColor('surface');
+  const success = getColor('success');
+  const error = getColor('error');
+  const warning = getColor('warning');
+  const info = getColor('info');
 
   const styles = StyleSheet.create({
       // Layout styles
@@ -31,7 +36,7 @@ export function useThemeStyles() {
       card: {
         padding: 20,
         marginHorizontal: 20,
-        backgroundColor: background,
+        backgroundColor: surface,
         borderRadius: 15,
         shadowColor: '#000',
         shadowOffset: {
@@ -70,12 +75,12 @@ export function useThemeStyles() {
       // Input styles
       input: {
         borderWidth: 1,
-        borderColor: icon + '40', // Adiciona transparência
+        borderColor: tint + '30', // Roxo com transparência
         padding: 15,
         borderRadius: 10,
         marginBottom: 15,
         fontSize: 16,
-        backgroundColor: background,
+        backgroundColor: surface,
         color: text,
       },
       
@@ -88,14 +93,30 @@ export function useThemeStyles() {
         marginVertical: 10,
       },
       buttonSecondary: {
-        backgroundColor: icon + '20',
+        backgroundColor: tint + '20',
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        marginVertical: 10,
+        borderWidth: 1,
+        borderColor: tint + '40',
+      },
+      buttonDanger: {
+        backgroundColor: error,
         padding: 15,
         borderRadius: 10,
         alignItems: 'center',
         marginVertical: 10,
       },
-      buttonDanger: {
-        backgroundColor: '#FF3B30',
+      buttonSuccess: {
+        backgroundColor: success,
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        marginVertical: 10,
+      },
+      buttonWarning: {
+        backgroundColor: warning,
         padding: 15,
         borderRadius: 10,
         alignItems: 'center',
@@ -107,14 +128,36 @@ export function useThemeStyles() {
       
       // Button text styles
       buttonTextPrimary: {
-        color: 'white',
+        color: '#FFFFFF',
         fontSize: 18,
         fontWeight: '600',
       },
       buttonTextSecondary: {
-        color: text,
+        color: tint,
         fontSize: 16,
         fontWeight: '600',
+      },
+      
+      // Message styles
+      messageSuccess: {
+        color: success,
+        fontSize: 14,
+        fontWeight: '500',
+      },
+      messageError: {
+        color: error,
+        fontSize: 14,
+        fontWeight: '500',
+      },
+      messageWarning: {
+        color: warning,
+        fontSize: 14,
+        fontWeight: '500',
+      },
+      messageInfo: {
+        color: info,
+        fontSize: 14,
+        fontWeight: '500',
       },
       
       // Utility styles
@@ -128,7 +171,7 @@ export function useThemeStyles() {
       },
       separator: {
         height: 1,
-        backgroundColor: icon + '20',
+        backgroundColor: tint + '20',
         marginVertical: 20,
       },
   });

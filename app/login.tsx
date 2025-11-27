@@ -1,24 +1,25 @@
+import { useThemeStyles } from '@/hooks/useThemeStyles';
+import { useToast } from '@/hooks/useToast';
+import { authAPI } from '@/services/api';
+import { LoginCredentials } from '@/types/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import { authAPI } from '@/services/api';
-import { LoginCredentials } from '@/types/auth';
-import { useThemeStyles } from '@/hooks/useThemeStyles';
-import { useToast } from '@/hooks/useToast';
 
 export default function Login() {
   const router = useRouter();
   const { styles } = useThemeStyles();
-  const { showSuccess, showError, showInfo } = useToast();
+  const { showSuccess, showError } = useToast();
   
   const [credentials, setCredentials] = useState<LoginCredentials>({
     email: '',
@@ -38,11 +39,17 @@ export default function Login() {
       const response = await authAPI.login(credentials);
       
       if (response.success) {
+        // Armazena token e user para sessão
+        try {
+          if (response.token) await AsyncStorage.setItem('authToken', response.token);
+          if (response.user) await AsyncStorage.setItem('user', JSON.stringify(response.user));
+        } catch (e) {
+          console.error('AsyncStorage error on login:', e);
+        }
+
         showSuccess(response.message, 'Login realizado!');
-        // Navega para as tabs após login bem-sucedido
-        setTimeout(() => {
-          router.replace('/(tabs)');
-        }, 1500); // Pequeno delay para mostrar o toast
+        // Navega para as tabs após login bem-sucedido (imediato)
+        router.replace('/(tabs)');
       } else {
         showError(response.message, 'Erro no login');
       }
@@ -54,22 +61,6 @@ export default function Login() {
     }
   };
 
-  const fillTestCredentials = (type: 'user' | 'admin') => {
-    if (type === 'user') {
-      setCredentials({
-        email: 'usuario@exemplo.com',
-        password: '123456'
-      });
-      showInfo('Credenciais de usuário preenchidas', 'Teste');
-    } else {
-      setCredentials({
-        email: 'admin@exemplo.com',
-        password: '123456'
-      });
-      showInfo('Credenciais de administrador preenchidas', 'Teste');
-    }
-  };
-
   return (
     <KeyboardAvoidingView 
       style={styles.container}
@@ -77,7 +68,8 @@ export default function Login() {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.card}>
-          <Text style={styles.title}>Login</Text>
+          <Text style={styles.title}>Boravê</Text>
+          <Text style={[styles.subtitle, { marginBottom: 20 }]}>Login</Text>
           
           <Text style={styles.label}>Email</Text>
           <TextInput
@@ -112,26 +104,6 @@ export default function Login() {
             ) : (
               <Text style={styles.buttonTextPrimary}>Entrar</Text>
             )}
-          </TouchableOpacity>
-
-          <View style={styles.separator} />
-          
-          <Text style={[styles.label, { textAlign: 'center' }]}>Credenciais de teste:</Text>
-          
-          <TouchableOpacity 
-            style={styles.buttonSecondary}
-            onPress={() => fillTestCredentials('user')}
-            disabled={loading}
-          >
-            <Text style={styles.buttonTextSecondary}>Usuário Teste</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={styles.buttonSecondary}
-            onPress={() => fillTestCredentials('admin')}
-            disabled={loading}
-          >
-            <Text style={styles.buttonTextSecondary}>Administrador</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 

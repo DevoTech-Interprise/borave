@@ -5,25 +5,60 @@
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#0a7ea4';
+// Tema Claro
+const lightPrimary = '#8A2BE2'; // Roxo primário
+const lightPrimaryLight = '#9B30FF'; // Roxo mais claro para destaque
+const lightSecondary = '#FFFFFF'; // Branco
+const lightBackground = '#F5F5F5'; // Cinza muito claro
+const lightText = '#333333'; // Cinza escuro
+const lightSurface = '#FFFFFF'; // Branco
+
+// Tema Escuro
+const darkPrimary = '#9370DB'; // Roxo claro
+const darkPrimaryLight = '#AB47BC'; // Roxo mais vibrante
+const darkSecondary = '#FFFFFF'; // Branco
+const darkBackground = '#121212'; // Preto
+const darkText = '#E0E0E0'; // Cinza claro
+const darkSurface = '#2D2D2D'; // Cinza escuro
+
+// Cores adicionais para ambos os temas
+const colorSuccess = '#4CAF50'; // Verde
+const colorWarning = '#FF9800'; // Laranja
+const colorError = '#F44336'; // Vermelho
+const colorInfo = '#2196F3'; // Azul
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    text: lightText,
+    background: lightBackground,
+    tint: lightPrimary,
+    primary: lightPrimary,
+    primaryLight: lightPrimaryLight,
+    secondary: lightSecondary,
+    surface: lightSurface,
+    icon: '#999999',
+    tabIconDefault: '#999999',
+    tabIconSelected: lightPrimary,
+    success: colorSuccess,
+    warning: colorWarning,
+    error: colorError,
+    info: colorInfo,
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    text: darkText,
+    background: darkBackground,
+    tint: darkPrimary,
+    primary: darkPrimary,
+    primaryLight: darkPrimaryLight,
+    secondary: darkSecondary,
+    surface: darkSurface,
+    icon: '#B0B0B0',
+    tabIconDefault: '#B0B0B0',
+    tabIconSelected: darkPrimary,
+    success: colorSuccess,
+    warning: colorWarning,
+    error: colorError,
+    info: colorInfo,
   },
 };
 

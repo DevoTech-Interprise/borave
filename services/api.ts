@@ -1,66 +1,170 @@
-import { LoginCredentials, AuthResponse, User } from '../types/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthResponse, LoginCredentials, LoginResponse, ProfileResponse, RegisterCredentials } from '../types/auth';
 
-// Dados mockados
-const mockUsers: User[] = [
-  {
-    id: '1',
-    email: 'usuario@exemplo.com',
-    name: 'Usuário Teste'
-  },
-  {
-    id: '2',
-    email: 'admin@exemplo.com',
-    name: 'Administrador'
+const API_BASE_URL = 'https://backend-developer-sigma.vercel.app/api';
+
+// Função auxiliar para fazer requisições
+const apiCall = async <T,>(
+  endpoint: string,
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET',
+  body?: any,
+  token?: string
+): Promise<T> => {
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
   }
-];
 
-// Simula delay de rede
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+  const options: RequestInit = {
+    method,
+    headers,
+  };
+
+  if (body) {
+    options.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+
+  if (!response.ok) {
+    // backend returns errors in the shape: { error: "Credenciais inválidas" }
+    const errorData = await response.json().catch(() => ({}));
+    const errMsg = (errorData && (errorData.error || errorData.message)) || `HTTP ${response.status}`;
+    throw new Error(errMsg);
+  }
+
+  // successful response
+  return response.json();
+};
 
 export const authAPI = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    await delay(1000); // Simula tempo de resposta da API
+    try {
+      const response = await apiCall<LoginResponse>(
+        '/auth/login',
+        'POST',
+        credentials
+      );
 
-    // Validação básica
-    if (!credentials.email || !credentials.password) {
+      return {
+        success: true,
+        message: response.message,
+        user: response.user,
+        token: response.token,
+      };
+    } catch (error) {
       return {
         success: false,
-        message: 'Email e senha são obrigatórios'
+        message: error instanceof Error ? error.message : 'Erro ao fazer login',
       };
     }
+  },
 
-    // Verifica se o usuário existe
-    const user = mockUsers.find(u => u.email === credentials.email);
-    
-    if (!user) {
+  register: async (credentials: RegisterCredentials): Promise<AuthResponse> => {
+    try {
+      const response = await apiCall<LoginResponse>(
+        '/auth/register',
+        'POST',
+        credentials
+      );
+
+      return {
+        success: true,
+        message: response.message,
+        user: response.user,
+        token: response.token,
+      };
+    } catch (error) {
       return {
         success: false,
-        message: 'Usuário não encontrado'
+        message: error instanceof Error ? error.message : 'Erro ao registrar',
       };
     }
+  },
 
-    // Senha mockada - em app real isso viria do backend
-    if (credentials.password !== '123456') {
+  getProfile: async (token: string): Promise<AuthResponse> => {
+    try {
+      const response = await apiCall<ProfileResponse>(
+        '/auth/profile',
+        'GET',
+        undefined,
+        token
+      );
+
+      return {
+        success: true,
+        message: 'Perfil obtido com sucesso',
+        user: response.user,
+      };
+    } catch (error) {
       return {
         success: false,
-        message: 'Senha incorreta'
+        message: error instanceof Error ? error.message : 'Erro ao obter perfil',
       };
     }
-
-    // Login bem-sucedido
-    return {
-      success: true,
-      message: 'Login realizado com sucesso',
-      user: user,
-      token: 'mock-jwt-token-' + user.id
-    };
   },
 
   logout: async (): Promise<{ success: boolean; message: string }> => {
-    await delay(500);
+    try {
+      // limpa credenciais locais
+      await AsyncStorage.removeItem('authToken');
+      await AsyncStorage.removeItem('user');
+    } catch (e) {
+      console.error('Error clearing AsyncStorage on logout:', e);
+    }
+
     return {
       success: true,
-      message: 'Logout realizado com sucesso'
+      message: 'Logout realizado com sucesso',
     };
-  }
+  },
+};
+
+export const usersAPI = {
+  getUser: async (userId: number, token: string): Promise<AuthResponse> => {
+    try {
+      const response = await apiCall<ProfileResponse>(
+        `/users/${userId}`,
+        'GET',
+        undefined,
+        token
+      );
+
+      return {
+        success: true,
+        message: 'Usuário obtido com sucesso',
+        user: response.user,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Erro ao obter usuário',
+      };
+    }
+  },
+
+  updateUser: async (userId: number, data: Partial<{ name: string; email: string }>, token: string): Promise<AuthResponse> => {
+    try {
+      const response = await apiCall<ProfileResponse>(
+        `/users/${userId}`,
+        'PUT',
+        data,
+        token
+      );
+
+      return {
+        success: true,
+        message: 'Usuário atualizado com sucesso',
+        user: response.user,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Erro ao atualizar usuário',
+      };
+    }
+  },
 };
