@@ -58,7 +58,7 @@ export function useThemeStyles() {
       },
       subtitle: {
         fontSize: 18,
-        color: icon,
+        color: text,
         marginBottom: 50,
         textAlign: 'center',
       },
@@ -86,7 +86,7 @@ export function useThemeStyles() {
       
       // Button styles
       buttonPrimary: {
-        backgroundColor: tint,
+        backgroundColor: text,
         padding: 15,
         borderRadius: 10,
         alignItems: 'center',
@@ -128,7 +128,7 @@ export function useThemeStyles() {
       
       // Button text styles
       buttonTextPrimary: {
-        color: '#FFFFFF',
+        color: '#',
         fontSize: 18,
         fontWeight: '600',
       },
@@ -158,6 +158,13 @@ export function useThemeStyles() {
         color: info,
         fontSize: 14,
         fontWeight: '500',
+      },
+
+      logo: {
+        width: 200,
+        height: 120,
+        resizeMode: 'contain',
+        marginBottom: 30,
       },
       
       // Utility styles

@@ -6,18 +6,18 @@
 import { Platform } from 'react-native';
 
 // Tema Claro
-const lightPrimary = '#8A2BE2'; // Roxo primário
+const lightPrimary = '#7F0CCB'; // Roxo primário
 const lightPrimaryLight = '#9B30FF'; // Roxo mais claro para destaque
 const lightSecondary = '#FFFFFF'; // Branco
-const lightBackground = '#F5F5F5'; // Cinza muito claro
-const lightText = '#333333'; // Cinza escuro
-const lightSurface = '#FFFFFF'; // Branco
+const lightBackground = '#7F0CCB'; // Cinza muito claro
+const lightText = '#fff'; // Cinza escuro
+const lightSurface = '#ffffffff'; // Branco
 
 // Tema Escuro
-const darkPrimary = '#9370DB'; // Roxo claro
+const darkPrimary = '#7F0CCB'; // Roxo claro
 const darkPrimaryLight = '#AB47BC'; // Roxo mais vibrante
 const darkSecondary = '#FFFFFF'; // Branco
-const darkBackground = '#121212'; // Preto
+const darkBackground = '#7F0CCB'; // Preto
 const darkText = '#E0E0E0'; // Cinza claro
 const darkSurface = '#2D2D2D'; // Cinza escuro
 

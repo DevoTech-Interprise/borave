@@ -3,6 +3,8 @@ export interface User {
   email: string;
   name: string;
   role: 'user' | 'admin';
+  userType: 'user' | 'establishment';
+  location?: string;
   created_at: string;
   updated_at?: string;
 }
@@ -16,6 +18,8 @@ export interface RegisterCredentials {
   name: string;
   email: string;
   password: string;
+  userType: 'user' | 'establishment';
+  location?: string;
 }
 
 export interface LoginResponse {
@@ -28,7 +32,16 @@ export interface ProfileResponse {
   user: User;
 }
 
-export interface AuthResponse {
+export interface Establishment {
+  id: number;
+  name: string;
+  location: string;
+  description?: string;
+  image?: string;
+  rating?: number;
+  ownerId: number;
+  createdAt: string;
+}export interface AuthResponse {
   success: boolean;
   message: string;
   user?: User;

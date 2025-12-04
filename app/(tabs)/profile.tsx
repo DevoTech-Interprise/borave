@@ -1,16 +1,22 @@
-import { useThemeStyles } from '@/hooks/useThemeStyles';
 import { useToast } from '@/hooks/useToast';
 import { authAPI, usersAPI } from '@/services/api';
+import { spacing, typography, useButtonStyles, useCardStyles, useColors, useInputStyles, useLayoutStyles } from '@/styles';
 import { User } from '@/types/auth';
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function Profile() {
   const router = useRouter();
-  const { styles } = useThemeStyles();
   const { showSuccess, showError } = useToast();
+  const layout = useLayoutStyles();
+  const card = useCardStyles();
+  const buttons = useButtonStyles();
+  const inputs = useInputStyles();
+  const colors = useColors();
+  
   const [loading, setLoading] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [user, setUser] = useState<User | null>(null);
@@ -107,25 +113,25 @@ export default function Profile() {
 
   if (loadingProfile) {
     return (
-      <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#8A2BE2" />
+      <View style={[layout.centered, { flex: 1 }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   if (!user) {
     return (
-      <View style={styles.container}>
-        <View style={{ padding: 20 }}>
-          <Text style={styles.title}>Perfil</Text>
-          <View style={styles.card}>
-            <Text style={styles.text}>Erro ao carregar perfil do usuário</Text>
+      <View style={layout.container}>
+        <View style={spacing.p5}>
+          <Text style={[typography.h2, { color: colors.text }]}>Perfil</Text>
+          <View style={[card.container, spacing.mt4]}>
+            <Text style={[typography.body, { color: colors.text }]}>Erro ao carregar perfil do usuário</Text>
           </View>
-          <TouchableOpacity 
-            style={styles.buttonSecondary}
+          <TouchableOpacity
+            style={[buttons.outline, spacing.mt4]}
             onPress={loadUserProfile}
           >
-            <Text style={styles.buttonTextSecondary}>Tentar Novamente</Text>
+            <Text style={buttons.outlineText}>Tentar Novamente</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -133,114 +139,180 @@ export default function Profile() {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={{ padding: 20 }}>
-        <Text style={styles.title}>Perfil</Text>
+    <View style={[layout.container, { backgroundColor: colors.background }]}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity>
+          <Ionicons name="arrow-back" size={24} color={colors.primary} />
+        </TouchableOpacity>
+        <Text style={[typography.h4, { color: colors.primary }]}>Perfil</Text>
+        <TouchableOpacity>
+          <Ionicons name="settings" size={24} color={colors.primary} />
+        </TouchableOpacity>
+      </View>
 
-        <View style={styles.card}>
-          <Text style={[styles.text, { fontWeight: 'bold', marginBottom: 15, fontSize: 18 }]}>
-            Informações do Usuário
+      <ScrollView contentContainerStyle={spacing.mb5} showsVerticalScrollIndicator={false}>
+        {/* Avatar e Info do Usuário */}
+        <View style={styles.profileHeader}>
+          <Image
+            source={{ uri: `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70)}` }}
+            style={styles.avatar}
+          />
+          <Text style={[typography.h3, typography.bold, { color: colors.text }, spacing.mt3]}>
+            {user?.name}
+          </Text>
+          <Text style={[typography.bodySmall, { color: colors.textSecondary }, spacing.mt1]}>
+            @{user?.name.toLowerCase().replace(/\s+/g, '')}
+          </Text>
+          <Text style={[typography.bodySmall, { color: colors.textSecondary }, spacing.mt2]}>
+            Avaliado por 68 Pessoas
           </Text>
 
-          {isEditing ? (
-            <>
-              <Text style={styles.label}>Nome</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Digite seu nome"
-                value={editData.name}
-                onChangeText={(text) => setEditData({ ...editData, name: text })}
-                editable={!loading}
+          {/* Rating */}
+          <View style={[styles.starsContainer, spacing.mt2]}>
+            {[1, 2, 3, 4].map((star) => (
+              <Ionicons
+                key={star}
+                name="star"
+                size={16}
+                color="#FFD700"
+                style={{ marginRight: 2 }}
               />
+            ))}
+            <Ionicons name="star-outline" size={16} color={colors.textSecondary} />
+          </View>
 
-              <Text style={styles.label}>Email</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Digite seu email"
-                value={editData.email}
-                onChangeText={(text) => setEditData({ ...editData, email: text })}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                editable={!loading}
-              />
-            </>
-          ) : (
-            <>
-              <View style={{ marginBottom: 12 }}>
-                <Text style={styles.label}>Nome</Text>
-                <Text style={styles.text}>{user.name}</Text>
-              </View>
-
-              <View style={{ marginBottom: 12 }}>
-                <Text style={styles.label}>Email</Text>
-                <Text style={styles.text}>{user.email}</Text>
-              </View>
-
-              <View style={{ marginBottom: 12 }}>
-                <Text style={styles.label}>ID</Text>
-                <Text style={styles.text}>{user.id}</Text>
-              </View>
-
-              <View style={{ marginBottom: 12 }}>
-                <Text style={styles.label}>Função</Text>
-                <Text style={styles.text}>
-                  {user.role === 'admin' ? 'Administrador' : 'Usuário'}
-                </Text>
-              </View>
-
-              <View>
-                <Text style={styles.label}>Data de Criação</Text>
-                <Text style={styles.text}>{user.created_at}</Text>
-              </View>
-            </>
-          )}
+          {/* Excelente classificação */}
+          <Text style={[typography.bodySmall, { color: colors.textSecondary }, spacing.mt2]}>
+            Excelente classificação
+          </Text>
         </View>
 
-        {isEditing ? (
-          <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
-            <TouchableOpacity
-              style={[styles.buttonPrimary, loading && styles.buttonDisabled, { flex: 1 }]}
-              onPress={handleSaveChanges}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.buttonTextPrimary}>Salvar</Text>
-              )}
-            </TouchableOpacity>
+        {/* Stats */}
+        <View style={[styles.statsContainer, spacing.mx4, spacing.my5]}>
+          <View style={styles.statItem}>
+            <Text style={[typography.h3, typography.bold, { color: colors.primary }]}>2728</Text>
+            <Text style={[typography.bodySmall, { color: colors.textSecondary }, spacing.mt1]}>
+              Seguidores
+            </Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Text style={[typography.h3, typography.bold, { color: colors.primary }]}>1986</Text>
+            <Text style={[typography.bodySmall, { color: colors.textSecondary }, spacing.mt1]}>
+              Seguindo
+            </Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Text style={[typography.h3, typography.bold, { color: colors.primary }]}>201</Text>
+            <Text style={[typography.bodySmall, { color: colors.textSecondary }, spacing.mt1]}>
+              Logins
+            </Text>
+          </View>
+        </View>
 
-            <TouchableOpacity
-              style={[styles.buttonSecondary, { flex: 1 }]}
-              onPress={() => {
-                setIsEditing(false);
-                setEditData({ name: user.name, email: user.email });
-              }}
-              disabled={loading}
-            >
-              <Text style={styles.buttonTextSecondary}>Cancelar</Text>
+        {/* Check-ins */}
+        <View style={spacing.px4}>
+          <View style={[layout.rowBetween, spacing.mb4]}>
+            <Text style={[typography.body, typography.bold, { color: colors.primary }]}>
+              CHECK IN ANTERIORES
+            </Text>
+            <TouchableOpacity>
+              <Text style={[typography.bodySmall, { color: colors.primary }]}>Ver tudo</Text>
             </TouchableOpacity>
           </View>
-        ) : (
-          <TouchableOpacity
-            style={[styles.buttonSecondary, { marginTop: 20 }]}
-            onPress={() => setIsEditing(true)}
-            disabled={loading}
-          >
-            <Text style={styles.buttonTextSecondary}>Editar Perfil</Text>
-          </TouchableOpacity>
-        )}
 
+          {/* Check-in Item 1 */}
+          <TouchableOpacity style={[styles.checkinItem, spacing.mb3]}>
+            <View style={layout.rowBetween}>
+              <View style={{ flex: 1 }}>
+                <Text style={[typography.body, typography.bold, { color: colors.text }]}>
+                  Boi na brasa
+                </Text>
+                <Text style={[typography.bodySmall, { color: colors.textSecondary }, spacing.mt1]}>
+                  Sazubim - PE
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+            </View>
+          </TouchableOpacity>
+
+          {/* Check-in Item 2 */}
+          <TouchableOpacity style={styles.checkinItem}>
+            <View style={layout.rowBetween}>
+              <View style={{ flex: 1 }}>
+                <Text style={[typography.body, typography.bold, { color: colors.text }]}>
+                  A Moenda
+                </Text>
+                <Text style={[typography.bodySmall, { color: colors.textSecondary }, spacing.mt1]}>
+                  João Alfredo - PE
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        {/* Logout Button */}
         <TouchableOpacity
-          style={[styles.buttonDanger, loading && styles.buttonDisabled, { marginTop: 20 }]}
+          style={[buttons.danger, spacing.mx4, spacing.mt5, spacing.mb5 ,{ marginTop: 32 }]}
           onPress={handleLogout}
           disabled={loading}
         >
-          <Text style={styles.buttonTextPrimary}>
-            {loading ? 'Saindo...' : 'Sair da Conta'}
-          </Text>
+          <Text style={buttons.dangerText}>{loading ? 'Saindo...' : 'Sair da Conta'}</Text>
         </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingTop: 50,
+  },
+  profileHeader: {
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 24,
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+  },
+  starsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    justifyContent: 'space-between',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statDivider: {
+    width: 1,
+    backgroundColor: '#E0E0E0',
+  },
+  checkinItem: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0, 0, 0, 0.05)',
+  },
+});

@@ -168,3 +168,102 @@ export const usersAPI = {
     }
   },
 };
+
+export const checkInAPI = {
+  createCheckIn: async (
+    data: {
+      establishmentId: string;
+      description: string;
+      image?: string;
+    },
+    token: string
+  ): Promise<{ success: boolean; message: string; checkIn?: any }> => {
+    try {
+      const response = await apiCall<any>(
+        '/checkins',
+        'POST',
+        data,
+        token
+      );
+
+      return {
+        success: true,
+        message: 'Check-in publicado com sucesso',
+        checkIn: response,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Erro ao criar check-in',
+      };
+    }
+  },
+
+  getCheckIns: async (token: string): Promise<{ success: boolean; message: string; checkIns?: any[] }> => {
+    try {
+      const response = await apiCall<any>(
+        '/checkins',
+        'GET',
+        undefined,
+        token
+      );
+
+      return {
+        success: true,
+        message: 'Check-ins obtidos com sucesso',
+        checkIns: response,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Erro ao obter check-ins',
+      };
+    }
+  },
+};
+
+export const establishmentAPI = {
+  getEstablishments: async (token?: string): Promise<{ success: boolean; message: string; establishments?: any[] }> => {
+    try {
+      const response = await apiCall<any>(
+        '/establishments',
+        'GET',
+        undefined,
+        token
+      );
+
+      return {
+        success: true,
+        message: 'Estabelecimentos obtidos com sucesso',
+        establishments: response,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Erro ao obter estabelecimentos',
+      };
+    }
+  },
+
+  getEstablishmentsByLocation: async (location: string, token?: string): Promise<{ success: boolean; message: string; establishments?: any[] }> => {
+    try {
+      const response = await apiCall<any>(
+        `/establishments?location=${encodeURIComponent(location)}`,
+        'GET',
+        undefined,
+        token
+      );
+
+      return {
+        success: true,
+        message: 'Estabelecimentos obtidos com sucesso',
+        establishments: response,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Erro ao obter estabelecimentos',
+      };
+    }
+  },
+};
